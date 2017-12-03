@@ -1,35 +1,23 @@
 #ifndef DRAWPANE_H
 #define DRAWPANE_H
 
+#include "wx/wx.h"
 #include <vector>
+
+#include "myleakage.h"
+#include "mycolors.h"
 
 #include "air/leakage.h"
 #include "air/multizone.h"
 
 using namespace std;
 
-class MyLeakage : public wxPoint
-{
-  public:
-    void setPosition(wxPoint p);
-    wxPoint getPosition();
-
-    int con1, con2; // node connections for leakage
-};
-
-// Store coordinates of the zone to be drawn
-class MyZone : public wxRect
-{
-  // 42
-  public:
-    void allPositive();
-};
-
 enum SelectedTool
 {
   NO_TOOL=0,
   ZONE_TOOL=1,
-  LEAKAGE_TOOL=2
+  LEAKAGE_TOOL=2,
+  EDIT_TOOL=3
 };
 
 enum DrawingTool
@@ -63,11 +51,14 @@ public:
   void mouseUp(wxMouseEvent& event);
   void mouseMoved(wxMouseEvent& event);
 
+  void scrollUp(wxMouseEvent& event);
+
   
   SelectedTool getToolState();
   void setStateNoTool(wxCommandEvent& event);
   void setStateZoneTool(wxCommandEvent& event);
   void setStateLeakageTool(wxCommandEvent& event);
+  void setStateEditTool(wxCommandEvent& event);
 
 private:
 
@@ -81,8 +72,11 @@ private:
   bool pointOnEdge(wxPoint p, vector<MyZone> z);
   bool pointCloseToPoint(const wxPoint &a, const wxPoint &b, int d);
   bool pointCloseToCorner(const wxPoint &p, const vector<MyZone> z);
+  bool pointInsideCircle(const wxPoint &p, const wxPoint &cp, const int &r);
+  bool pointInsideTemperatureCircles(wxPoint p, vector<MyZone> &z, int &m);
 
   // Air
+public:
   MultiZone multizone;
 
 /*
