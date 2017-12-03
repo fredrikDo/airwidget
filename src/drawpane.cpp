@@ -1,57 +1,17 @@
-#include "wx/wx.h"
-
 #include "drawpane.h"
-
-void MyLeakage::setPosition(wxPoint p)
-{
-  x = p.x;
-  y = p.y;
-}
-
-wxPoint MyLeakage::getPosition()
-{
-  wxPoint r;
-  r.x = x;
-  r.y = y;
-
-  return r;
-}
-
-void MyZone::allPositive()
-{
-  if (this -> IsEmpty())
-  {
-    wxPoint fst = GetTopLeft();
-    wxPoint snd = GetBottomRight();
-
-    int w = GetWidth();
-    int h = GetHeight();
-
-    if (w < 0 && h > 0)
-    {
-      SetTopLeft(wxPoint(snd.x, fst.y));
-      SetBottomRight(wxPoint(fst.x, snd.y));
-    }
-    else if (w > 0 && h < 0)
-    {
-      SetTopLeft(wxPoint(fst.x, snd.y));
-      SetBottomRight(wxPoint(snd.x, fst.y));
-    }
-    else if (w < 0 && h < 0)
-    {
-      SetTopLeft(wxPoint(snd.x, snd.y));
-      SetBottomRight(wxPoint(fst.x, fst.y));
-    }
-  }
-}
 
 DrawPane::DrawPane(wxFrame* parent) : wxPanel(parent)
 {
   // Make drawing pane backround color white
-  SetBackgroundColour(*wxGREEN);
+  //SetBackgroundColour(*wxGREEN);
+  SetBackgroundColour(MyColors::COLOR_DRAWPANE_BACKGROUND);
+
 
   // State when no tool is selected
   this -> currentTool = NO_TOOL;
+
+  // Add boundary
+  multizone.addFixedPressure(0);
 }
 
 void DrawPane::updateMousePosition()
@@ -176,6 +136,40 @@ bool DrawPane::pointCloseToCorner(const wxPoint &p, const vector<MyZone> z)
   return r;
 }
 
+bool DrawPane::pointInsideCircle(const wxPoint &p, const wxPoint &cp, const int &r)
+{
+  bool ret = false;
+
+  if (pow(p.x - cp.x, 2) + pow(p.y - cp.y, 2) < r * r)
+  {
+    ret = true;
+  }
+  return ret;
+}
+
+bool DrawPane::pointInsideTemperatureCircles(wxPoint p, vector<MyZone> &zones, int &m)
+{
+  // See if point is inside temperature circle of any of the zones
+  // and returns zone number
+
+  bool r = false;
+
+  for (int i=0; i<zones.size(); i++)
+  {
+    if (pointInsideCircle(p, zones[i].getCenter(), 15))
+    {
+      r = true; //zones[i].setMouseOnTemperature(true);
+      m = i;
+    }
+    /*
+    else
+    {
+      zones[i].setMouseOnTemperature(false);
+    }*/
+  }
+  return r;
+}
+
 void DrawPane::paintEvent(wxPaintEvent & evt)
 {
   wxPaintDC dc(this);
@@ -188,8 +182,14 @@ void DrawPane::paintNow()
   render(dc);
 }
 
-void DrawPane::render(wxDC&  dc)
+void DrawPane::render(wxDC& dc)
 {
+    // Solve
+    if (!zones.empty() && leakages.size() > 1)
+    {
+      multizone.solve();
+    }
+
     // draw some text
     //dc.DrawText(wxT("Testing"), 40, 60); 
  
@@ -200,19 +200,24 @@ void DrawPane::render(wxDC&  dc)
  
     // draw a rectangle
     //dc.SetBrush(*wxBLUE_BRUSH); // blue filling
-  dc.SetPen( wxPen( wxColor(0, 0, 0), 1 ) ); // 10-pixels-thick pink outline
+  dc.SetPen( wxPen( MyColors::COLOR_ZONE_LINE )); // 10-pixels-thick pink outline
+  dc.SetBrush(MyColors::COLOR_ZONE_BACKGROUND);
 
   for (int i=0; i<zones.size(); i++)
   {
     //dc.DrawRectangle(zones[i].x, zones[i].y, zones[i].w, zones[i].h);
     //dc.DrawRectangle(wxRect(zones[i].start, zones[i].end));
-    dc.DrawRectangle(zones[i]);
+    //dc.DrawRectangle(zones[i]);
+    zones[i].draw(dc);
+    zones[i].drawTemperature(multizone.getZoneTemperature(i), dc);
   }
 
   // Draw leakages
+  double maxFlow = multizone.getMaxLeakageMassFlow();
   for (int i=0; i<leakages.size(); i++)
   {
-    dc.DrawCircle(leakages[i], 5);
+    leakages[i].draw(dc);
+    leakages[i].drawArrow(dc, multizone.getLeakageMassflow(i), maxFlow);
   }
 
   switch(currentTool)
@@ -231,16 +236,20 @@ void DrawPane::render(wxDC&  dc)
           // Color red if intersecting with other zones
           if (zoneIntersectsZones(temporaryZone, zones))
           {
-            dc.SetPen(wxPen(*wxRED, 1));
+            temporaryZone.drawIllegal(dc);
           }
-
-          // Draw temporaryZone
-          dc.DrawRectangle(temporaryZone);
+          else
+          {
+            // Draw temporaryZone
+            temporaryZone.draw(dc);
+          }
           break;
       }
       break;
     case LEAKAGE_TOOL:
-      dc.DrawCircle(temporaryLeakage, 5);
+      temporaryLeakage.draw(dc);
+      break;
+    case EDIT_TOOL:
       break;
   }
 
@@ -285,8 +294,16 @@ void DrawPane::mouseDown(wxMouseEvent& event)
       if (pointOnEdge(temporaryLeakage.getPosition(), zones)
             && !pointCloseToCorner(temporaryLeakage.getPosition(), zones))
       {
+        // Update connection
+        temporaryLeakage.relateToZones(zones);
+        // Add leakage to airflow-model
+        multizone.addLeakage(temporaryLeakage.h, 1.0, 0.65,
+          {temporaryLeakage.con1, temporaryLeakage.con2},
+          {temporaryLeakage.t1, temporaryLeakage.t2});
         leakages.push_back(temporaryLeakage);
       }
+      break;
+    case EDIT_TOOL:
       break;
   }
 }
@@ -311,12 +328,15 @@ void DrawPane::mouseUp(wxMouseEvent& event)
         // Add airflowzone
         // 20 degC temperature
         multizone.addZone(temporaryZone.GetHeight(), 293);
+        //cout << temporaryZone.GetHeight() << endl << endl;
       }
       // Stop drawing the zone
       currentDrawingState = NOT_DRAWING;
       break;
 
     case LEAKAGE_TOOL:
+      break;
+    case EDIT_TOOL:
       break;
   }
 }
@@ -346,6 +366,17 @@ void DrawPane::mouseMoved(wxMouseEvent& event)
       mouse = snap(mouse, zones);
       temporaryLeakage.setPosition(mouse);
       break;
+    case EDIT_TOOL:
+      int i = 0;
+      if (pointInsideTemperatureCircles(mouse, zones, i))
+      {
+        zones[i].setMouseOnTemperature(true);
+      }
+      else
+      {
+        zones[i].setMouseOnTemperature(false);
+      }
+      break;
   }
   Refresh();
 }
@@ -353,6 +384,27 @@ void DrawPane::mouseMoved(wxMouseEvent& event)
 SelectedTool DrawPane::getToolState()
 {
   return currentTool;
+}
+
+void DrawPane::scrollUp(wxMouseEvent& event)
+{
+  switch(currentTool)
+  {
+    case NO_TOOL:
+      break;
+    case ZONE_TOOL:
+      break;
+    case LEAKAGE_TOOL:
+      break;
+    case EDIT_TOOL:
+      int i = 0;
+      if (pointInsideTemperatureCircles(mouse, zones, i))
+      {
+        multizone.adjustZoneTemperature(event.GetWheelRotation(), i);
+      }
+      break;
+  }
+  Refresh();
 }
 
 void DrawPane::setStateNoTool(wxCommandEvent& event)
@@ -371,4 +423,9 @@ void DrawPane::setStateZoneTool(wxCommandEvent& event)
 void DrawPane::setStateLeakageTool(wxCommandEvent& event)
 {
   this -> currentTool = LEAKAGE_TOOL;
+}
+
+void DrawPane::setStateEditTool(wxCommandEvent& event)
+{
+  this -> currentTool = EDIT_TOOL;
 }

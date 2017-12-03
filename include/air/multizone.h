@@ -8,10 +8,12 @@
 // Eigen
 #include <Eigen/Dense>
 
+//
 #include "leakage.h"
 
 using namespace std;
 using namespace Eigen;
+
 
 struct Zone
 {
@@ -23,16 +25,17 @@ struct Zone
 	int id;
 };
 
-struct FixedPressure
+struct Boundary
 {
 	double P;
-	int id;
+	//int id;
 };
 
 struct Node
 {
 	double P;
 	char type;
+  int i;
 };
 
 class MultiZone
@@ -42,28 +45,36 @@ private:
 	double Te;
 	vector<Leakage> leakages;
 	vector<Zone> zones;
-	vector<FixedPressure> fixedPressures;
-	vector<Node> nodes;
+  vector<Boundary> boundaries;
 	
-	double sumMassFlow(int);
-	double sumAbsMassFlow(int);
-  double sumPartialDerivative(int, int);
-	
+	double sumMassFlow(int, bool);
+	double sumAbsMassFlow(int, bool);
+  double sumPartialDerivative(int, int, bool);
+	void calcStackEffect();
 	void update(); 
+  bool solver(bool lin);
 
 public:
 
 	MultiZone();
 	
-	void addLeakage(double, double, double, int, int);
+  void addLeakage(double, double, double, vector<int>, vector<NodeType>);
 	
 	void addZone(double, double);
 	
 	void addFixedPressure(double);
 	
 	void solve();
-	
-	void calcStackEffect();
+
+  double getLeakageMassflow(int i);
+
+  void setZoneTemperature(double T_, int i);
+
+  void adjustZoneTemperature(double T_, int i);
+
+  double getZoneTemperature(int i);
+
+  double getMaxLeakageMassFlow();
 };
 
 #endif

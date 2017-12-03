@@ -4,26 +4,37 @@
 // Included dependencies
 #include <vector>
 #include <iostream>
+#include <cmath>
 
 using namespace std;
+
+enum NodeType
+{
+  ZONE,
+  BOUNDARY
+};
 
 class Leakage 
 {
 
 private:
-	
+  vector<int> connections;
+  vector<NodeType> nodeTypes;
+
 public:
-
-	double T1, T2, P1, P2, Pstack1, Pstack2;
 	int n1, n2;
+  NodeType t1, t2;
 	
-	double h, C, n;
+	double T1, T2, P1, P2, Pstack1, Pstack2;
+	
 	char type;
-
-	Leakage(double, double, double, int, int);
 	
-	double massflow();
-	double partialDerivative();
+  double h, C, n;
+
+	Leakage(double, double, double, vector<int>, vector<NodeType>);
+	
+	double massflow(bool);
+	double partialDerivative(bool);
 };
 
 #endif

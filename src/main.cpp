@@ -6,6 +6,7 @@
 
 const int ID_ZONE_TOOL = 100;
 const int ID_LEAKAGE_TOOL = 101;
+const int ID_EDIT_TOOL = 102;
 
  // Declare our main frame class
 class MyFrame : public wxFrame
@@ -18,6 +19,7 @@ class MyFrame : public wxFrame
   void OnQuit(wxCommandEvent& event);
   void setStateZoneTool(wxCommandEvent& event);
   void setStateLeakageTool(wxCommandEvent& event);
+  void setStateEditTool(wxCommandEvent& event);
  
   // Main drawpane 
   DrawPane* mainDrawPane;
@@ -45,16 +47,21 @@ MyFrame::MyFrame(const wxString& title)
     wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER);
 
   wxImage::AddHandler(new wxPNGHandler);
-  wxBitmap bmpExit = wxBITMAP_PNG_FROM_DATA(pencil);
+  wxBitmap bmpExit = wxBITMAP_PNG_FROM_DATA(exit);//wxBITMAP_PNG_FROM_DATA(pencil);
   
   wxBitmap bmpWind = wxBITMAP_PNG_FROM_DATA(sailboat);
   wxBitmap bmpRuler = wxBITMAP_PNG_FROM_DATA(ruler);
   
+  wxBitmap bmpAdjust = wxBITMAP_PNG_FROM_DATA(adjust);
+  
   this -> SetToolBar(toolBar);
-  toolBar -> AddTool(wxID_EXIT, wxT("Exit"), bmpExit);
-  toolBar -> AddSeparator();
+  //toolBar -> AddTool(wxID_EXIT, wxT("Exit"), bmpExit);
+  //toolBar -> AddSeparator();
   toolBar -> AddCheckTool(ID_ZONE_TOOL, wxT("Zone"), bmpWind);
   toolBar -> AddCheckTool(ID_LEAKAGE_TOOL, wxT("Leakage"), bmpRuler);
+  toolBar -> AddCheckTool(ID_EDIT_TOOL, wxT("Adjust"), bmpAdjust);
+  toolBar -> AddSeparator();
+  toolBar -> AddTool(wxID_EXIT, wxT("Exit"), bmpExit);
   toolBar -> Realize();
 }
 
@@ -78,6 +85,7 @@ void MyFrame::setStateZoneTool(wxCommandEvent& event)
   if (toolBar -> GetToolState(ID_ZONE_TOOL))
   {
     toolBar -> ToggleTool(ID_LEAKAGE_TOOL, false);
+    toolBar -> ToggleTool(ID_EDIT_TOOL, false);
   }
 }
 
@@ -96,6 +104,26 @@ void MyFrame::setStateLeakageTool(wxCommandEvent& event)
   if (toolBar -> GetToolState(ID_LEAKAGE_TOOL))
   {
     toolBar -> ToggleTool(ID_ZONE_TOOL, false);
+    toolBar -> ToggleTool(ID_EDIT_TOOL, false);
+  }
+}
+
+void MyFrame::setStateEditTool(wxCommandEvent& event)
+{
+  if (mainDrawPane -> getToolState() == EDIT_TOOL)
+  {
+    mainDrawPane -> setStateNoTool(event);
+  }
+  else
+  {
+    mainDrawPane -> setStateEditTool(event);
+  }
+
+  // Untoggle other tools
+  if (toolBar -> GetToolState(ID_EDIT_TOOL))
+  {
+    toolBar -> ToggleTool(ID_ZONE_TOOL, false);
+    toolBar -> ToggleTool(ID_LEAKAGE_TOOL, false);
   }
 }
 
@@ -105,7 +133,9 @@ BEGIN_EVENT_TABLE(DrawPane, wxPanel)
   EVT_LEFT_UP(DrawPane::mouseUp)
   EVT_MOTION(DrawPane::mouseMoved)
   // catch paint events
-  EVT_PAINT(DrawPane::paintEvent) 
+  EVT_PAINT(DrawPane::paintEvent)
+  // mouse
+  EVT_MOUSEWHEEL(DrawPane::scrollUp)
 END_EVENT_TABLE()
 
 // Declare the application class
@@ -127,6 +157,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
   EVT_MENU(wxID_EXIT, MyFrame::OnQuit)
   EVT_TOOL(ID_ZONE_TOOL, MyFrame::setStateZoneTool)
   EVT_TOOL(ID_LEAKAGE_TOOL, MyFrame::setStateLeakageTool)
+  EVT_TOOL(ID_EDIT_TOOL, MyFrame::setStateEditTool)
 END_EVENT_TABLE()
 
 bool MyApp::OnInit()

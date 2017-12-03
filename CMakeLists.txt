@@ -10,6 +10,9 @@ add_definitions(-std=c++11 -g)
 # Define sources 
 set(SOURCES src/main.cpp
             src/drawpane.cpp
+            src/myleakage.cpp
+            src/myzone.cpp
+            src/mycolors.cpp
             src/air/leakage.cpp
             src/air/multizone.cpp)
 
