@@ -47,21 +47,22 @@ MyFrame::MyFrame(const wxString& title)
     wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER);
 
   wxImage::AddHandler(new wxPNGHandler);
-  wxBitmap bmpExit = wxBITMAP_PNG_FROM_DATA(exit);//wxBITMAP_PNG_FROM_DATA(pencil);
   
-  wxBitmap bmpWind = wxBITMAP_PNG_FROM_DATA(sailboat);
-  wxBitmap bmpRuler = wxBITMAP_PNG_FROM_DATA(ruler);
-  
+  //wxBitmap bmpExit = wxBITMAP_PNG_FROM_DATA(exit);//wxBITMAP_PNG_FROM_DATA(pencil);
+  //wxBitmap bmpWind = wxBITMAP_PNG_FROM_DATA(sailboat);
+  wxBitmap bmpLeak = wxBITMAP_PNG_FROM_DATA(leak);
   wxBitmap bmpAdjust = wxBITMAP_PNG_FROM_DATA(adjust);
+  wxBitmap bmpDraw = wxBITMAP_PNG_FROM_DATA(draw);
   
   this -> SetToolBar(toolBar);
+  toolBar -> SetToolBitmapSize(wxSize(128,128));
   //toolBar -> AddTool(wxID_EXIT, wxT("Exit"), bmpExit);
   //toolBar -> AddSeparator();
-  toolBar -> AddCheckTool(ID_ZONE_TOOL, wxT("Zone"), bmpWind);
-  toolBar -> AddCheckTool(ID_LEAKAGE_TOOL, wxT("Leakage"), bmpRuler);
+  toolBar -> AddCheckTool(ID_ZONE_TOOL, wxT("Zone"), bmpDraw);
+  toolBar -> AddCheckTool(ID_LEAKAGE_TOOL, wxT("Leakage"), bmpLeak);
   toolBar -> AddCheckTool(ID_EDIT_TOOL, wxT("Adjust"), bmpAdjust);
   toolBar -> AddSeparator();
-  toolBar -> AddTool(wxID_EXIT, wxT("Exit"), bmpExit);
+  //toolBar -> AddTool(wxID_EXIT, wxT("Exit"), bmpExit);
   toolBar -> Realize();
 }
 

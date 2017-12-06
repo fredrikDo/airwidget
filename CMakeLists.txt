@@ -2,7 +2,7 @@
 project(main)
 
 # CMake version
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.5)
 
 # -
 add_definitions(-std=c++11 -g)
