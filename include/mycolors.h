@@ -13,7 +13,7 @@ namespace MyColors
   const wxColour COLOR_LEAKAGE_BACKGROUND(255, 255, 255);
 
   // ZONE
-  const wxColour COLOR_ZONE_BACKGROUND(245, 245, 245);
+  const wxColour COLOR_ZONE_BACKGROUND(255, 255, 255);
   const wxColour COLOR_ZONE_LINE(91, 91, 91);
 
   // AIRFLOW ARROWS

@@ -2,10 +2,8 @@
 
 DrawPane::DrawPane(wxFrame* parent) : wxPanel(parent)
 {
-  // Make drawing pane backround color white
-  //SetBackgroundColour(*wxGREEN);
+  // Set drawing pane backround color 
   SetBackgroundColour(MyColors::COLOR_DRAWPANE_BACKGROUND);
-
 
   // State when no tool is selected
   this -> currentTool = NO_TOOL;
@@ -232,7 +230,9 @@ void DrawPane::render(wxDC& dc)
           // Do nothing!
           break;
         case DRAWING_ZONE:
-          
+         
+          //temporaryZone.allPositive();
+ 
           // Color red if intersecting with other zones
           if (zoneIntersectsZones(temporaryZone, zones))
           {
@@ -400,7 +400,7 @@ void DrawPane::scrollUp(wxMouseEvent& event)
       int i = 0;
       if (pointInsideTemperatureCircles(mouse, zones, i))
       {
-        multizone.adjustZoneTemperature(event.GetWheelRotation(), i);
+        multizone.adjustZoneTemperature(event.GetWheelRotation()*0.01, i);
       }
       break;
   }
