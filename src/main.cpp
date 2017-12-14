@@ -8,6 +8,8 @@ const int ID_ZONE_TOOL = 100;
 const int ID_LEAKAGE_TOOL = 101;
 const int ID_EDIT_TOOL = 102;
 
+const int ID_ARROW_DISP = 203;
+
  // Declare our main frame class
 class MyFrame : public wxFrame
 {
@@ -21,6 +23,8 @@ class MyFrame : public wxFrame
   void setStateLeakageTool(wxCommandEvent& event);
   void setStateEditTool(wxCommandEvent& event);
  
+  void setStateDisplayArrow(wxCommandEvent& event);
+  
   // Main drawpane 
   DrawPane* mainDrawPane;
 
@@ -48,27 +52,44 @@ MyFrame::MyFrame(const wxString& title)
 
   wxImage::AddHandler(new wxPNGHandler);
   
-  //wxBitmap bmpExit = wxBITMAP_PNG_FROM_DATA(exit);//wxBITMAP_PNG_FROM_DATA(pencil);
-  //wxBitmap bmpWind = wxBITMAP_PNG_FROM_DATA(sailboat);
   wxBitmap bmpLeak = wxBITMAP_PNG_FROM_DATA(leak);
   wxBitmap bmpAdjust = wxBITMAP_PNG_FROM_DATA(adjust);
   wxBitmap bmpDraw = wxBITMAP_PNG_FROM_DATA(draw);
-  
+ 
+  wxBitmap bmpArrow = wxBITMAP_PNG_FROM_DATA(arrow);
+  wxBitmap bmpPressure_vertical = wxBITMAP_PNG_FROM_DATA(pressure_vertical);  
+ 
   this -> SetToolBar(toolBar);
   toolBar -> SetToolBitmapSize(wxSize(128,128));
-  //toolBar -> AddTool(wxID_EXIT, wxT("Exit"), bmpExit);
-  //toolBar -> AddSeparator();
+ 
+  // Add tools... 
   toolBar -> AddCheckTool(ID_ZONE_TOOL, wxT("Zone"), bmpDraw);
   toolBar -> AddCheckTool(ID_LEAKAGE_TOOL, wxT("Leakage"), bmpLeak);
   toolBar -> AddCheckTool(ID_EDIT_TOOL, wxT("Adjust"), bmpAdjust);
   toolBar -> AddSeparator();
-  //toolBar -> AddTool(wxID_EXIT, wxT("Exit"), bmpExit);
+
+  toolBar -> AddCheckTool(ID_ARROW_DISP, wxT("Arrow"), bmpArrow);
+  toolBar -> AddCheckTool(ID_ARROW_DISP, wxT("Pressure Vertical"), bmpPressure_vertical);
+  
   toolBar -> Realize();
 }
 
 void MyFrame::OnQuit(wxCommandEvent& event)
 {
   Close();
+}
+
+void MyFrame::setStateDisplayArrow(wxCommandEvent& event)
+{
+  if (mainDrawPane -> displayArrow)
+  {
+    mainDrawPane -> displayArrow = false;
+  }
+  else
+  {
+    mainDrawPane -> displayArrow = true;
+  }
+  mainDrawPane -> Refresh();
 }
 
 void MyFrame::setStateZoneTool(wxCommandEvent& event)
@@ -159,6 +180,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
   EVT_TOOL(ID_ZONE_TOOL, MyFrame::setStateZoneTool)
   EVT_TOOL(ID_LEAKAGE_TOOL, MyFrame::setStateLeakageTool)
   EVT_TOOL(ID_EDIT_TOOL, MyFrame::setStateEditTool)
+  EVT_TOOL(ID_ARROW_DISP, MyFrame::setStateDisplayArrow)
 END_EVENT_TABLE()
 
 bool MyApp::OnInit()

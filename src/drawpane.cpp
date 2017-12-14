@@ -215,7 +215,10 @@ void DrawPane::render(wxDC& dc)
   for (int i=0; i<leakages.size(); i++)
   {
     leakages[i].draw(dc);
-    leakages[i].drawArrow(dc, multizone.getLeakageMassflow(i), maxFlow);
+    if (displayArrow)
+    {
+      leakages[i].drawArrow(dc, multizone.getLeakageMassflow(i), maxFlow);
+    }
   }
 
   switch(currentTool)

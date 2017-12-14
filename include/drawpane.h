@@ -60,6 +60,8 @@ public:
   void setStateLeakageTool(wxCommandEvent& event);
   void setStateEditTool(wxCommandEvent& event);
 
+  bool displayArrow = false;
+
 private:
 
   wxPoint mouse;
