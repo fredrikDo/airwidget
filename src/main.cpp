@@ -9,6 +9,7 @@ const int ID_LEAKAGE_TOOL = 101;
 const int ID_EDIT_TOOL = 102;
 
 const int ID_ARROW_DISP = 203;
+const int ID_PRESSURE_VERTICAL_DISP = 204;
 
  // Declare our main frame class
 class MyFrame : public wxFrame
@@ -24,6 +25,7 @@ class MyFrame : public wxFrame
   void setStateEditTool(wxCommandEvent& event);
  
   void setStateDisplayArrow(wxCommandEvent& event);
+  void setStateDisplayPressureVertical(wxCommandEvent& event);
   
   // Main drawpane 
   DrawPane* mainDrawPane;
@@ -69,7 +71,7 @@ MyFrame::MyFrame(const wxString& title)
   toolBar -> AddSeparator();
 
   toolBar -> AddCheckTool(ID_ARROW_DISP, wxT("Arrow"), bmpArrow);
-  toolBar -> AddCheckTool(ID_ARROW_DISP, wxT("Pressure Vertical"), bmpPressure_vertical);
+  toolBar -> AddCheckTool(ID_PRESSURE_VERTICAL_DISP, wxT("Pressure Vertical"), bmpPressure_vertical);
   
   toolBar -> Realize();
 }
@@ -90,6 +92,18 @@ void MyFrame::setStateDisplayArrow(wxCommandEvent& event)
     mainDrawPane -> displayArrow = true;
   }
   mainDrawPane -> Refresh();
+}
+
+void MyFrame::setStateDisplayPressureVertical(wxCommandEvent& event)
+{
+  if (mainDrawPane -> displayPressureVertical)
+  {
+    mainDrawPane -> displayPressureVertical = false;
+  }
+  else
+  {
+    mainDrawPane -> displayPressureVertical = true;
+  }
 }
 
 void MyFrame::setStateZoneTool(wxCommandEvent& event)
@@ -181,6 +195,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
   EVT_TOOL(ID_LEAKAGE_TOOL, MyFrame::setStateLeakageTool)
   EVT_TOOL(ID_EDIT_TOOL, MyFrame::setStateEditTool)
   EVT_TOOL(ID_ARROW_DISP, MyFrame::setStateDisplayArrow)
+  EVT_TOOL(ID_PRESSURE_VERTICAL_DISP, MyFrame::setStateDisplayPressureVertical)
 END_EVENT_TABLE()
 
 bool MyApp::OnInit()

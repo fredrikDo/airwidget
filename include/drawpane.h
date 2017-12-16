@@ -6,6 +6,8 @@
 
 #include "myleakage.h"
 #include "mycolors.h"
+#include "elements.h"
+#include "drawpaneFunctions.h"
 
 #include "air/leakage.h"
 #include "air/multizone.h"
@@ -37,6 +39,9 @@ public:
 
   DrawPane(wxFrame* parent);
 
+  // Create Elements that contains all drawn elements
+  Elements elements;
+
   wxMouseState mouseState;
 
   SelectedTool currentTool;
@@ -61,6 +66,7 @@ public:
   void setStateEditTool(wxCommandEvent& event);
 
   bool displayArrow = false;
+  bool displayPressureVertical = false;
 
 private:
 
@@ -68,16 +74,8 @@ private:
   wxPoint mouse_down;
 
   void updateMousePosition();
-  bool pointIsInsideZones(wxPoint p, vector<MyZone> z);
-  wxPoint snap(wxPoint p, vector<MyZone> z);
-  bool zoneIntersectsZones(MyZone t, vector<MyZone> z);
-  bool pointOnEdge(wxPoint p, vector<MyZone> z);
-  bool pointCloseToPoint(const wxPoint &a, const wxPoint &b, int d);
-  bool pointCloseToCorner(const wxPoint &p, const vector<MyZone> z);
-  bool pointInsideCircle(const wxPoint &p, const wxPoint &cp, const int &r);
-  bool pointInsideTemperatureCircles(wxPoint p, vector<MyZone> &z, int &m);
 
-  // Air
+// Air
 public:
   MultiZone multizone;
 

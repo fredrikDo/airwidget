@@ -21,153 +21,6 @@ void DrawPane::updateMousePosition()
   mouse.y = mouseState.GetY() - GetScreenPosition().y;
 }
 
-bool DrawPane::pointIsInsideZones(wxPoint p, vector<MyZone> z)
-{
-  // Check if point is inside vector of zones and return
-  // true or false
-
-  bool r = false;
-  
-  for (int i=0; i<z.size(); i++)
-  {
-    if (z[i].Contains(p))
-    {
-      r = true;
-      break;
-    }
-  }
-  return r;
-}
-
-bool DrawPane::zoneIntersectsZones(MyZone t, vector<MyZone> z)
-{
-  bool r = false;
-
-  t.allPositive();
-  t.Deflate(1, 1);
-
-  for (int i=0; i<z.size(); i++)
-  {
-    if (t.Intersects(z[i]))
-    {
-      r = true;
-      break;
-    }
-  }
-  return r;
-}
-
-wxPoint DrawPane::snap(wxPoint p, vector<MyZone> z)
-{
-  int delta = 5;
-
-  for (int i=0; i<z.size(); i++)
-  {
-    // x-direction
-    if (abs(p.x - z[i].GetLeft()) < delta)
-    {
-      p.x = z[i].GetLeft();
-    }
-    else if (abs(p.x - z[i].GetRight()) < delta)
-    {
-      p.x = z[i].GetRight();
-    }
-    // y-direction
-    if (abs(p.y - z[i].GetTop()) < delta)
-    {
-      p.y = z[i].GetTop();
-    }
-    else if (abs(p.y - z[i].GetBottom()) < delta)
-    {
-      p.y = z[i].GetBottom();
-    }
-  }
-  return p;
-}
-
-bool DrawPane::pointOnEdge(wxPoint p, vector<MyZone> z)
-{
-  bool r = false;
-
-  for (int i=0; i<z.size(); i++)
-  {
-    if (z[i].Contains(p))
-    {
-      if (p.x == z[i].GetLeft()
-            || p.x == z[i].GetRight()
-            || p.y == z[i].GetTop()
-            || p.y == z[i].GetBottom())
-      {
-        r = true;
-      }
-    }
-  }
-  return r;
-}
-
-bool DrawPane::pointCloseToPoint(const wxPoint &a, const wxPoint &b, int d)
-{
-  bool r = false;
-
-  if (pow(a.x - b.x, 2) + pow(a.y - b.y, 2) < pow(d, 2))
-  {
-    r = true;
-  }
-  return r;
-}
-
-bool DrawPane::pointCloseToCorner(const wxPoint &p, const vector<MyZone> z)
-{
-  bool r = false;
-  int d = 5;
-
-  for (int i=0; i<z.size(); i++)
-  {
-    if (pointCloseToPoint(p, z[i].GetTopLeft(), d)
-          || pointCloseToPoint(p, z[i].GetTopRight(), d)
-          || pointCloseToPoint(p, z[i].GetBottomLeft(), d)
-          || pointCloseToPoint(p, z[i].GetBottomRight(), d))
-    {
-      r = true;
-    }
-  }
-  return r;
-}
-
-bool DrawPane::pointInsideCircle(const wxPoint &p, const wxPoint &cp, const int &r)
-{
-  bool ret = false;
-
-  if (pow(p.x - cp.x, 2) + pow(p.y - cp.y, 2) < r * r)
-  {
-    ret = true;
-  }
-  return ret;
-}
-
-bool DrawPane::pointInsideTemperatureCircles(wxPoint p, vector<MyZone> &zones, int &m)
-{
-  // See if point is inside temperature circle of any of the zones
-  // and returns zone number
-
-  bool r = false;
-
-  for (int i=0; i<zones.size(); i++)
-  {
-    if (pointInsideCircle(p, zones[i].getCenter(), 15))
-    {
-      r = true; //zones[i].setMouseOnTemperature(true);
-      m = i;
-    }
-    /*
-    else
-    {
-      zones[i].setMouseOnTemperature(false);
-    }*/
-  }
-  return r;
-}
-
 void DrawPane::paintEvent(wxPaintEvent & evt)
 {
   wxPaintDC dc(this);
@@ -208,6 +61,12 @@ void DrawPane::render(wxDC& dc)
     //dc.DrawRectangle(zones[i]);
     zones[i].draw(dc);
     zones[i].drawTemperature(multizone.getZoneTemperature(i), dc);
+    
+  }
+
+  if (displayPressureVertical)
+  {
+    elements.draw(dc);
   }
 
   // Draw leakages
@@ -335,6 +194,9 @@ void DrawPane::mouseUp(wxMouseEvent& event)
       }
       // Stop drawing the zone
       currentDrawingState = NOT_DRAWING;
+
+      // Update elements
+      elements.update(zones);
       break;
 
     case LEAKAGE_TOOL:

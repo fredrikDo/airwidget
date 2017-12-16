@@ -13,6 +13,8 @@ set(SOURCES src/main.cpp
             src/myleakage.cpp
             src/myzone.cpp
             src/mycolors.cpp
+            src/drawpaneFunctions.cpp
+            src/elements.cpp
             src/air/leakage.cpp
             src/air/multizone.cpp)
 
