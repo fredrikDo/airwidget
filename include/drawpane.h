@@ -9,8 +9,8 @@
 #include "elements.h"
 #include "drawpaneFunctions.h"
 
-#include "air/leakage.h"
-#include "air/multizone.h"
+#include "../../airflow/lib/leakage.h"
+#include "../../airflow/lib/multizone.h"
 
 using namespace std;
 

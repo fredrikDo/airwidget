@@ -15,15 +15,18 @@ set(SOURCES src/main.cpp
             src/mycolors.cpp
             src/drawpaneFunctions.cpp
             src/elements.cpp
-            src/air/leakage.cpp
-            src/air/multizone.cpp)
+            ../airflow/lib/leakage.cpp
+            ../airflow/lib/multizone.cpp)
 
 # Define executable
 set(EXECUTABLE_NAME main)
 add_executable(${EXECUTABLE_NAME} ${SOURCES})
 
-# Inlcude headers
+# Include headers
 include_directories(include)
+
+# Include airflow headers
+include_directories (home/fredrik/Git/airflow/lib)
 
 # Include Eigen
 include_directories (/usr/local/include/eigen3)
