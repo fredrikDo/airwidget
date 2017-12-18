@@ -88,7 +88,7 @@ void MyLeakage::relateToZones(vector<MyZone> z)
   }
 
   // Set height
-  h = p.y; // CHANGE THIS!
+  h = 1000 - p.y; // CHANGE THIS!
 }
 
 void MyLeakage::drawArrow(wxDC &dc, double flow, double maxFlow)
@@ -117,7 +117,7 @@ void MyLeakage::drawArrow(wxDC &dc, double flow, double maxFlow)
     
     dc.DrawRectangle(x-10, y-0.5*t+0, 20, t);
 
-    if (flow > 0) // -->
+    if (flow < 0) // -->
     {
       //wxPoint trianglePoints[3] = {wxPoint(x+10,y-t), wxPoint(x+10,y+t-1), wxPoint(x+10+t,y)};
       //dc.DrawPolygon(3, trianglePoints);
@@ -133,7 +133,7 @@ void MyLeakage::drawArrow(wxDC &dc, double flow, double maxFlow)
       //dc.DrawLine( x+15, y, x+10, y+5 ); // draw line across the rectangle
       //dc.DrawLine( x+15, y, x+10, y-5 ); // draw line across the rectangle  
     }
-    else if (flow < 0) // <--
+    else if (flow > 0) // <--
     {
       wxPoint trianglePoints[3] = {wxPoint(x-10,y-t), wxPoint(x-10,y+t), wxPoint(x-10-t,y)};
       dc.DrawPolygon(3, trianglePoints);
@@ -159,7 +159,7 @@ void MyLeakage::drawArrow(wxDC &dc, double flow, double maxFlow)
 
     // ->
     
-    if (flow > 0) // Arrow Down
+    if (flow < 0) // Arrow Down
     {
       wxPoint arrow[7] = {wxPoint(x-0.5*t, y-10),
                           wxPoint(x-0.5*t, y+10),
@@ -172,7 +172,7 @@ void MyLeakage::drawArrow(wxDC &dc, double flow, double maxFlow)
       //dc.DrawLine( x, y+15, x+5, y+10 ); // draw line across the rectangle
       //dc.DrawLine( x, y+15, x-5, y+10 ); // draw line across the rectangle  
     }
-    else if (flow < 0) // Arrow Up
+    else if (flow > 0) // Arrow Up
     {
       wxPoint arrow[7] = {wxPoint(x-0.5*t, y+10),
                           wxPoint(x-0.5*t, y-10),
@@ -192,5 +192,5 @@ void MyLeakage::draw(wxDC &dc)
 {
   dc.SetPen( wxPen( MyColors::COLOR_LEAKAGE_LINE, 1 ) );
   dc.SetBrush(MyColors::COLOR_LEAKAGE_BACKGROUND);
-  dc.DrawCircle(x, y, 5);
+  dc.DrawCircle(x, y, 3);
 }

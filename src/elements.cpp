@@ -47,6 +47,27 @@ vector <wxPoint> Elements::sort(vector <wxPoint> unsorted, char axis)
   return sorted;
 }
 
+void Elements::updatePressures(MultiZone &m)
+{
+  // D....
+  // ADJUST THIS WHEN ADDING "PROPER" HEIGHT INTO THE MODEL
+  for (int i=0; i<elements.size(); i++)
+  {
+    elements[i].delta_P1 = m.getPressure(elements[i].z_left, 1000-elements[i].p1.y) -
+      m.getPressure(elements[i].z_right, 1000-elements[i].p1.y);
+    
+    elements[i].delta_P2 = m.getPressure(elements[i].z_left, 1000-elements[i].p2.y) -
+      m.getPressure(elements[i].z_right, 1000-elements[i].p2.y);
+  }
+  
+  // Point to be drawn as pressuredifference
+  for (int i=0; i<elements.size(); i++)
+  {
+    elements[i].P1 = elements[i].p1 + wxPoint(0.1*elements[i].delta_P1, 0);
+    elements[i].P2 = elements[i].p2 + wxPoint(0.1*elements[i].delta_P2, 0);
+  }
+}
+
 void Elements::update(vector<MyZone> &zones)
 {
   elements.clear(); 
@@ -94,6 +115,9 @@ void Elements::update(vector<MyZone> &zones)
   {
     elements[i].z_left = getZoneNumber(elements[i].p1-wxPoint(5,-5), zones);
     elements[i].z_right = getZoneNumber(elements[i].p1-wxPoint(-5,-5), zones);
+
+    // Add local height to each element
+    elements[i].h = elements[i].p2.y - elements[i].p1.y;
   }
   
   /*
@@ -112,17 +136,22 @@ void Elements::update(vector<MyZone> &zones)
 
 void Elements::draw(wxDC &dc)
 {
+  /*
   for (int i=0; i<elements.size(); i++)
   {
     dc.SetPen( wxPen(wxColor(255,0,0)));
     dc.DrawLine(elements[i].p1, elements[i].p2);
     dc.DrawCircle(wxPoint(elements[i].p1.x, elements[i].p1.y+0.5*(elements[i].p2.y-elements[i].p1.y)), wxCoord(4));
   }
-  /*
+  */
+  
   // TEST
   //dc.DrawLine();
-  dc.SetBrush(wxColour(100,100,100));
-  wxPoint p[4] = {wxPoint(100,100), wxPoint(100,300), wxPoint(150,300), wxPoint(50, 100)};
-  dc.DrawPolygon(4, p); 
-  */
+  dc.SetBrush(wxColour(200,200,200));
+  
+  for (int i=0; i<elements.size(); i++)
+  {
+    wxPoint p[4] = {elements[i].p1, elements[i].p2, elements[i].P2, elements[i].P1};
+    dc.DrawPolygon(4, p);
+  }
 }

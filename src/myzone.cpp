@@ -73,7 +73,7 @@ void MyZone::drawTemperature(double T, wxDC &dc)
   }
   */
   wxString temperature;
-  temperature << T;
+  temperature << T << " K";
 
   int w, h;
   /*

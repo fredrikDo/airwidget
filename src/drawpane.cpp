@@ -39,6 +39,7 @@ void DrawPane::render(wxDC& dc)
     if (!zones.empty() && leakages.size() > 1)
     {
       multizone.solve();
+      elements.updatePressures(multizone);
     }
 
     // draw some text
@@ -164,6 +165,7 @@ void DrawPane::mouseDown(wxMouseEvent& event)
           {temporaryLeakage.t1, temporaryLeakage.t2});
         leakages.push_back(temporaryLeakage);
       }
+      elements.updatePressures(multizone);
       break;
     case EDIT_TOOL:
       break;
@@ -197,6 +199,7 @@ void DrawPane::mouseUp(wxMouseEvent& event)
 
       // Update elements
       elements.update(zones);
+      elements.updatePressures(multizone);
       break;
 
     case LEAKAGE_TOOL:
@@ -245,7 +248,7 @@ void DrawPane::mouseMoved(wxMouseEvent& event)
   }
   Refresh();
 }
-
+ 
 SelectedTool DrawPane::getToolState()
 {
   return currentTool;
