@@ -5,6 +5,9 @@
 
 namespace MyColors
 {
+  // HELP LINE 
+  const wxColour COLOR_HELP_LINE(200, 200, 200);
+  
   // DRAWPANE
   const wxColour COLOR_DRAWPANE_BACKGROUND(255, 255, 255);
 

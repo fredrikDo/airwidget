@@ -50,7 +50,9 @@ public:
   void paintEvent(wxPaintEvent & evt);
   void paintNow();
  
-  void render(wxDC& dc);
+  void render(wxDC &dc);
+
+  void drawHelpLines(wxDC &dc);
 
   void mouseDown(wxMouseEvent& event);
   void mouseUp(wxMouseEvent& event);

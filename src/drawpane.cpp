@@ -33,6 +33,31 @@ void DrawPane::paintNow()
   render(dc);
 }
 
+void DrawPane::drawHelpLines(wxDC &dc)
+{
+  updateMousePosition();
+
+  wxPoint p = snap(mouse, zones);
+ 
+  int w, h; 
+  GetClientSize(&w, &h);
+
+  // Set color for help line
+  dc.SetPen(wxPen(MyColors::COLOR_HELP_LINE, 1));
+
+  for (int i=0; i<zones.size(); i++)
+  {
+    if (zones[i].GetLeft() == p.x || zones[i].GetRight() == p.x)
+    {
+      dc.DrawLine(wxPoint(p.x, 0), wxPoint(p.x, h));
+    }
+    else if (zones[i].GetTop() == p.y || zones[i].GetBottom() == p.y)
+    {
+      dc.DrawLine(wxPoint(0, p.y), wxPoint(w, p.y));
+    }
+  }
+}
+
 void DrawPane::render(wxDC& dc)
 {
     // Solve
@@ -41,6 +66,9 @@ void DrawPane::render(wxDC& dc)
       multizone.solve();
       elements.updatePressures(multizone);
     }
+  
+  // Draw help lines
+  drawHelpLines(dc);
 
     // draw some text
     //dc.DrawText(wxT("Testing"), 40, 60); 
@@ -140,6 +168,8 @@ void DrawPane::mouseDown(wxMouseEvent& event)
       // start drawing a new zone
       if (!pointIsInsideZones(mouse, zones))
       {
+        mouse = snap(mouse, zones);
+        
         //temporaryZone.start = mouse;
         temporaryZone.SetTopLeft(mouse);
 
