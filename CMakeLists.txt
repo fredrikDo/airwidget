@@ -26,10 +26,16 @@ add_executable(${EXECUTABLE_NAME} ${SOURCES})
 include_directories(include)
 
 # Include airflow headers
-include_directories (home/fredrik/Git/airflow/lib)
+#include_directories (home/fredrik/Git/airflow/lib)
+#include_directories (C:/Git/airflow/lib)
+include_directories (../airflow/lib)
 
 # Include Eigen
-include_directories (/usr/local/include/eigen3)
+IF (WIN32)
+				include_directories (C:/Users/domfr/Downloads/Eigen)
+ELSE()
+				include_directories (/usr/local/include/eigen3)
+ENDIF()
 
 find_package(wxWidgets COMPONENTS net gl core base)
 if(wxWidgets_FOUND)
