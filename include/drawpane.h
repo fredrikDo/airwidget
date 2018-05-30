@@ -2,6 +2,7 @@
 #define DRAWPANE_H
 
 #include "wx/wx.h"
+#include "wx/dcbuffer.h"
 #include <vector>
 
 #include "myleakage.h"
@@ -48,6 +49,7 @@ public:
   DrawingTool currentDrawingState;
  
   void paintEvent(wxPaintEvent & evt);
+	void eraseEvent(wxEraseEvent& evt);
   void paintNow();
  
   void render(wxDC &dc);

@@ -23,8 +23,20 @@ void DrawPane::updateMousePosition()
 
 void DrawPane::paintEvent(wxPaintEvent & evt)
 {
-  wxPaintDC dc(this);
+  //wxPaintDC dc(this);
+	wxBufferedPaintDC dc(this);
+
+	// Used with wxBufferedPaintDC
+	dc.Clear();
+
   render(dc);
+}
+
+void DrawPane::eraseEvent(wxEraseEvent & evt)
+{
+	// This should be left empty
+	// It prevents the background to be redrawn
+	// which removes flickering
 }
 
 void DrawPane::paintNow()
@@ -263,6 +275,10 @@ void DrawPane::mouseMoved(wxMouseEvent& event)
     case LEAKAGE_TOOL:
       mouse = snap(mouse, zones);
       temporaryLeakage.setPosition(mouse);
+			
+			// Refresh area around mouse pointer
+			//RefreshRect(wxRect(mouse.x-32, mouse.y-32, 64, 64));
+
       break;
     case EDIT_TOOL:
       int i = 0;
@@ -276,7 +292,7 @@ void DrawPane::mouseMoved(wxMouseEvent& event)
       }
       break;
   }
-  Refresh();
+  Refresh(true);
 }
  
 SelectedTool DrawPane::getToolState()

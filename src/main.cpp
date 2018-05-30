@@ -1,5 +1,6 @@
 #include "wx/wx.h"
 #include "wx/toolbar.h"
+#include "wx/dcbuffer.h"
 
 #include "drawpane.h"
 #include "icons.h"
@@ -170,6 +171,7 @@ BEGIN_EVENT_TABLE(DrawPane, wxPanel)
   EVT_MOTION(DrawPane::mouseMoved)
   // catch paint events
   EVT_PAINT(DrawPane::paintEvent)
+	EVT_ERASE_BACKGROUND(DrawPane::eraseEvent) // <-- Removes Flickering
   // mouse
   EVT_MOUSEWHEEL(DrawPane::scrollUp)
 END_EVENT_TABLE()
@@ -202,6 +204,9 @@ bool MyApp::OnInit()
 {
   // Create the main application window
   MyFrame *frame = new MyFrame(wxT("Minimal wxWidgets App"));
+
+	//frame->SetDoubleBuffered(true);
+
   // Show it
   frame->Show(true);
   // Start the event loop
