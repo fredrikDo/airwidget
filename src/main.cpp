@@ -63,7 +63,8 @@ MyFrame::MyFrame(const wxString& title)
   wxBitmap bmpPressure_vertical = wxBITMAP_PNG_FROM_DATA(pressure_vertical);  
  
   this -> SetToolBar(toolBar);
-  toolBar -> SetToolBitmapSize(wxSize(128,128));
+  //toolBar -> SetToolBitmapSize(wxSize(128,128));
+  toolBar -> SetToolBitmapSize(wxSize(32,32));
  
   // Add tools... 
   toolBar -> AddCheckTool(ID_ZONE_TOOL, wxT("Zone"), bmpDraw);
