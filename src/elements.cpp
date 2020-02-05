@@ -61,10 +61,11 @@ void Elements::updatePressures(MultiZone &m)
   }
   
   // Point to be drawn as pressuredifference
+  float scale = 0.3;
   for (int i=0; i<elements.size(); i++)
   {
-    elements[i].P1 = elements[i].p1 + wxPoint(0.1*elements[i].delta_P1, 0);
-    elements[i].P2 = elements[i].p2 + wxPoint(0.1*elements[i].delta_P2, 0);
+    elements[i].P1 = elements[i].p1 + wxPoint(scale*elements[i].delta_P1, 0);
+    elements[i].P2 = elements[i].p2 + wxPoint(scale*elements[i].delta_P2, 0);
   }
 }
 

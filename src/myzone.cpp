@@ -72,8 +72,9 @@ void MyZone::drawTemperature(double T, wxDC &dc)
     dc.SetBrush(MyColors::ZONE_TEMPERATURE_BRUSH_OFF);
   }
   */
+
   wxString temperature;
-  temperature << T << " K";
+  temperature << T-273 << " " << "\u00B0" << "C";
 
   int w, h;
   /*

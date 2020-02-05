@@ -314,7 +314,7 @@ void DrawPane::scrollUp(wxMouseEvent& event)
       int i = 0;
       if (pointInsideTemperatureCircles(mouse, zones, i))
       {
-        multizone.adjustZoneTemperature(event.GetWheelRotation()*0.01, i);
+        multizone.adjustZoneTemperature(round(event.GetWheelRotation()*0.01), i);
       }
       break;
   }
