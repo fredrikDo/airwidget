@@ -70,7 +70,7 @@ void DrawPane::drawHelpLines(wxDC &dc)
   }
 }
 
-void DrawPane::render(wxDC& dc)
+void DrawPane::update()
 {
     // Solve
     if (!zones.empty() && leakages.size() > 1)
@@ -78,6 +78,11 @@ void DrawPane::render(wxDC& dc)
       multizone.solve();
       elements.updatePressures(multizone);
     }
+}
+
+void DrawPane::render(wxDC& dc)
+{
+    //update();
   
   // Draw help lines
   drawHelpLines(dc);
@@ -235,6 +240,7 @@ void DrawPane::mouseUp(wxMouseEvent& event)
         // 20 degC temperature
         multizone.addZone(temporaryZone.GetHeight(), 293);
         //cout << temporaryZone.GetHeight() << endl << endl;
+        //
       }
       // Stop drawing the zone
       currentDrawingState = NOT_DRAWING;
@@ -245,6 +251,7 @@ void DrawPane::mouseUp(wxMouseEvent& event)
       break;
 
     case LEAKAGE_TOOL:
+      update();
       break;
     case EDIT_TOOL:
       break;
@@ -315,6 +322,7 @@ void DrawPane::scrollUp(wxMouseEvent& event)
       if (pointInsideTemperatureCircles(mouse, zones, i))
       {
         multizone.adjustZoneTemperature(round(event.GetWheelRotation()*0.01), i);
+        update();
       }
       break;
   }

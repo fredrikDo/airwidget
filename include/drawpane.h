@@ -53,6 +53,7 @@ public:
   void paintNow();
  
   void render(wxDC &dc);
+  void update();
 
   void drawHelpLines(wxDC &dc);
 
